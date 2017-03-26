@@ -18,28 +18,28 @@ PREDICATES
 /* * * Fakta-fakta tentang pembunuhan * * */
 CLAUSES
  orang(budi,55,m,tukang_kayu).
- orang(aldi,25,m,pemain_sepak_bola).%aldi adalah orang dan pemain sepak bola.
+ orang(aldi,25,m,pemain_sepak_bola).
  orang(aldi,25,m,tukang_jagal).
- orang(joni,25,m,pencopet).%joni adalah orang dan pencopet
+ orang(joni,25,m,pencopet).
 
  selingkuh(ina,joni).
  selingkuh(ina,budi).
- selingkuh(siti,joni).%siti selingkuh joni.
+ selingkuh(siti,joni).
 
- terbunuh_dengan(siti,pentungan).%ternyata siti terbunuh dengan pentungan
+ terbunuh_dengan(siti,pentungan).
  terbunuh(siti).
 
  motif(uang).
  motif(cemburu).
  motif(dendam).
 
- ternodai(budi, darah). %budi ternodai darah.
- ternodai(siti, darah). %siti ternodai darah.
- ternodai(aldi, lumpur). %aldi ternodai lumpur
- ternodai(joni, coklat). %joni ternodai coklat.
+ ternodai(budi, darah). 
+ ternodai(siti, darah). 
+ ternodai(aldi, lumpur).
+ ternodai(joni, coklat).
  ternodai(ina, coklat).
 
- milik(budi,kaki_palsu). %budi memiliki kaki palsu.
+ milik(budi,kaki_palsu).
  milik(joni,pistol).
  
  /* * * Basis Pengetahuan * * */
@@ -48,60 +48,90 @@ CLAUSES
  cara_kerja_mirip(gunting, pisau).
  cara_kerja_mirip(sepatu_bola, pentungan).
  
- kemungkinan_milik(X,sepatu_bola):- %x kemungkinan_milik sepatu bola, jika
- 	orang(X,_,_,pemain_sepak_bola). %x adalah pemain sepak bola. *lihat pada predikat orang. ****ternyata x= aldi****.
+ kemungkinan_milik(X,sepatu_bola):- 
+ 	orang(X,_,_,pemain_sepak_bola). 
   
- kemungkinan_milik(X,gunting):- %x kemungkinan_milik gunting, jika
-	 orang(X,_,_,pekerja_salon). % x adalah orang dan bekerja disalon
+ kemungkinan_milik(X,gunting):-
+	 orang(X,_,_,pekerja_salon). 
  
- kemungkinan_milik(X,Benda):-% x kemungkinan_milik benda(kaki palsu, balok dan sepatu bola), jika
-	 milik(X,Benda).%x milik benda(kaki palsu, balok dan sepatu bola). *lihat predikat milik. ternyata yang memiliki benda(kaki palsu, balok dan sepatu bola) adalah budi, dimana budi memiliki kaki palsu
+ kemungkinan_milik(X,Benda):-
+	 milik(X,Benda).
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 * dicurigai semua orang yang memiliki senjata yang *
 * kerjanya mirip dengan senjata penyebab siti terbunuh. *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
- dicurigai(X):- %x dicurigai jika,
-	 terbunuh_dengan(siti,Senjata) ,%siti terbunuh dengan senjata. * lihat pada predikat terbunuh_dengan, agar kita bisa mengetahui senjata apa yang digunakan oleh pembunuh
-	 cara_kerja_mirip(Benda,Senjata) ,%benda yang cara kerjanya mirip senjata, dimana senjata adalah pentungan. *lihat predicate cara_kerja_mirip, agar mengetahui benda apa yang cara kerjanya mirip dengan pentungan.
-	 				  %ternyata benda yang cara kerjanya mirip pentungan adalah kaki palsu, balok dan sepatu_bola.
-	 kemungkinan_milik(X,Benda).%x kemungkinan miliki benda(kaki palsu, balok dan sepatu bola). *lihat predikat kemungkinan_milik. *****ternyata x(budi dan aldi) kemungkinan milik benda(pistol dan sepatu bola)****.
+ dicurigai(X):- 
+	 terbunuh_dengan(siti,Senjata) ,
+	 cara_kerja_mirip(Benda,Senjata) ,
+	 				  
+	 kemungkinan_milik(X,Benda).
 	
 /* * * * * * * * * * * * * * * * * * * * * * * * * *
 * dicurigai laki-laki yang selingkuh dengan siti. *
 * * * * * * * * * * * * * * * * * * * * * * * * * */
- dicurigai(X):- %x dicurigai, jika
-	motif(cemburu),%cemburu merupaka motif dibalik pembunuhan.
-	orang(X,_,m,_),%x adalah orang dan bergender m(male).
-	selingkuh(siti,X).%siti selingkuh x. *lihat pada predicate selingkuh.****ternyata x adalah joni****
+ dicurigai(X):- 
+	motif(cemburu),
+	orang(X,_,m,_),
+	selingkuh(siti,X).
 	
 /* * * * * * * * * * * * * * * * * * * * * * *
 * dicurigai perempuan yang selingkuh dengan *
 * laki-laki yang juga selingkuh dengan siti *
 * * * * * * * * * * * * * * * * * * * * * * */
- dicurigai(X):-%x dicurigai, jika
-	motif(cemburu),%cemburu merupaka motif dibalik pembunuhan.
-	orang(X,_,f,_),%x adalah orang dan bergender f(female). pada predicate orang, tidak ditemukan orang dengan gender female.
+ dicurigai(X):-
+	motif(cemburu),
+	orang(X,_,f,_),
 	selingkuh(X,Lakilaki),
 	selingkuh(siti,Lakilaki).
 	
 /* * * * * * * * * * * * * * * * * * * * * * * * * * *
 * dicurigai pencopet yang mempunyai motif uang. *
 * * * * * * * * * * * * * * * * * * * * * * * * * * */
- dicurigai(X):- %x dicurigai, jika
-	motif(uang),%uang merupaka motif dibalik pembunuhan.
-	orang(X,_,_,pencopet).%x adalah orang dan merupakan pencopet. *lihat pada predicate orang. ****ternyata x adalah joni****
+ dicurigai(X):-
+	motif(uang),
+	orang(X,_,_,pencopet).
 
 %tempat predicate pembunuh, dimana predicate tersebut harus dibuktikan kebenarannya. 
- pembunuh(Pembunuh):- %pembunuh adalah pembunuh, jika					
-	orang(Pembunuh,_,_,_), %pembunuh merupaka orang, maka visual prolog akan mencari predicate orang dan mengecek, siapa saja yang menjadi tersangka. ternyata tersangkanya yaitu:budi,aldi,aldi,joni
-	terbunuh(Terbunuh), %terbunuh adalah terbunuh, maka visual prolog akan mencari predicate terbunuh dan mengecek, ternyata yang terbunuh adalah siti.
+ pembunuh(Pembunuh):- 
+	orang(Pembunuh,_,_,_), 
+	terbunuh(Terbunuh), 
 	Terbunuh <> Pembunuh, /* Bukan bunuh diri */
-	dicurigai(Pembunuh),%dan pembunuh adalah orang yang dicurigai, maka visual prolog akan mencari predicate dicurigai. *lihat pada bagian predicate di curigai. ternyata yang dicurigai adalah budi, joni,aldi.
-	ternodai(Pembunuh,Zat),%pembunuh(budi, aldi, joni) ternodai zat(darah,lumpur,coklat). *lihat predicate ternodai. 
-	ternodai(Terbunuh,Zat).%terbunuh(siti) ternodai zat(darah). *lihat pada predicate ternodai. ternyata siti dan budi sama-sama ternodai darah. sehingga dapat di pastikan bahwa budi adalah pembunuh siti
+	dicurigai(Pembunuh),
+	ternodai(Pembunuh,Zat),
+	ternodai(Terbunuh,Zat).
 
 GOAL
  pembunuh(X). 
- %karna pada goal yang dicari pembunuh, maka visual prolog akan mencari predicate pembunuh juga.
- %setelah dilakukan pengujian, ternyata budi merupakan pembunuh dari siti.
+
+ 
+ /*
+ Analisis :
+ 1. ketika program dijalankan, maka visual prolog akan mengecek predicate dari goal tersebut. ternyata predicate dari goal adalah pembunuh yang memiliki variable bebas yaitu X.
+ 2. kemudian visual prolog akan mencari pada klausa, dimana prolog akan mencari fakta/rule yang cocok dengan goal.maka prolog menemukan pembunuh(Pembunuh).
+ karna var.bebas dapat di unifikasi ke var. manapun. sehingga var.X di unifikasi dengan var.Pembunuh. jadi X=Pembunuh.
+ lalu visual prolog akan melanjutkan pengujian, dimana prolog akan mengecek subgoal, yaitu:
+ 	subgoal ke- :
+	1. pembunuh adalah pembunuh dan pembunuh adalah orang.
+	maka prolog akan mencari head/fakta yang sesuai dengan subgoal, prolog akan mencari dari bagian atas klausa sampai bagian bawah dari klausa.
+	maka ditemukan fakta, sehingga var.Pembunuh akan di ikat ke nilai budi, dan subgoal berikutnya akan dijalankan.
+	2. terbunuh adalah terbunuh.
+	lalu visual prolog akan mengecek klausa dari atas sampai ke bawah. dan menememukan fakta. sehingga var.terbunuh akan di ikat ke nilai siti. dan akan menjalankan subgoal berikutnya
+	3. terbunuh tidak sama dengan pembunuh
+	yang menandakan bahwa terbunuh tidak bunuh diri.
+	4. pembunuh merupakan yang dicurigai
+	visual prolog sekarang akan memulai pencarian untuk mencocokkan klausa dicurigai.karena var.X telah diunifikasi ke var.Pembunuh dan var.Pembunuh telah diikat dengan nilai "Budi", maka visual prolog akan memenuhi rule dicurigai.
+		1. siti terbunuh dengan senjata, dimana senjata merupakan variable bebas.
+		maka prolog akan mengecek klausa dari atas sampai kebawah untuk mencocokkan dengan subgoal. sehingga var.Senjata diikat ke nilai "pentungan".
+		2. benda cara_kerja_mirip senjata
+		karena senjata telah diikat dengan pentungan. maka prolog akan mencocokkan pada klausa cara_kerja_mirip(kaki_palsu, pentungan), dan var.Benda mengikat nilai "kaki palsu"
+		3. X kemungkinan milik benda. 
+		karena benda telah diikat dengan nilai kaki palsu, dan x= pembunuh=budi. dan pada klausa kemungkinan_milik bersifat identik,maka untuk rule dicurigai selesai. 
+	5. pembunuh ternodai zat
+	selanjutnya prolog akan memulai pencarian untuk melakukan pencocokan pemanggilan ternodai.karena pembunuh telah diikat dengan nilai "budi", maka pemanggilan sebenarnya adalah ternodai(budi,zat)
+	pada pencocokan pertama prolog akan mencocokkan dengan klausa ternodai(budi,darah), dan karena nilai argumen tersebut cocok dengan subgoal yang memanggil, maka var. Zat diikat pada nilai "darah".
+	6. terbunuh ternodai zat
+	subgoal terakhir yaitu terbunuh ternodai zat,karena terbunuh telah diikat dengan siti, maka prolog akan melakukan pencocokan dengan klausa. maka var.Zat diikat pada nilai darah. sehingga siti ternodai darah.
+ 
+ 3. setelah semua rule terpenuhi, maka visual prolog akan menampilkan pembunuh, dan pembunuh adalah BUDI.
+ */
